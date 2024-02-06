@@ -8,6 +8,7 @@ services:
     container_name: symfony-app-php
     volumes:
       - ./app:/var/www/html
+      - ./front:/var/www/html/front
     networks:
       - symfony-network
 
@@ -16,6 +17,7 @@ services:
     container_name: symfony-app-nginx
     volumes:
       - ./app:/var/www/html
+      - ./front:/var/www/html/front
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     ports:
       - "8080:80"
