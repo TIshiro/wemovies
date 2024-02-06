@@ -81,5 +81,4 @@ class AppController extends AbstractController
         }
         return $this->json($movie);
     }
-
 }
