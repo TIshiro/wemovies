@@ -1,0 +1,11 @@
+default:
+    suites:
+        default:
+            contexts:
+                - App\Tests\Behat\AppContext:
+                    kernel:
+                      env_variables_provider: 'symfony'
+
+    extensions:
+        FriendsOfBehat\SymfonyExtension:
+            bootstrap: tests/bootstrap.php
