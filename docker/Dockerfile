@@ -26,9 +26,6 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Copier les fichiers de l'application Symfony dans le conteneur
 COPY . /var/www/html
 
-# Installer les dépendances de l'application Symfony
-#RUN composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
-
 # Exposer le port 9000 pour PHP-FPM
 EXPOSE 9000
 

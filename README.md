@@ -47,19 +47,17 @@ __**BE SURE THAT 8080 port is available on your host machine**__
 docker-compose up -d --build
 ```
 
-- Go to http://localhost:8080
-
-Enjoy!
-
-## ❗ HintPoints:
-
-- Your project doesn't start:
+## ❇️ Install dependencies:
 
 ```bash
 docker exec -it symfony-app-php bash
 
 composer install
 ```
+
+- Go to http://localhost:8080
+
+Enjoy!
 
 ## ❇️ Tests:
 
