@@ -1,0 +1,45 @@
+{
+  "page": 1,
+  "results": [
+    {
+      "adult": false,
+      "backdrop_path": "/4MCKNAc6AbWjEsM2h9Xc29owo4z.jpg",
+      "genre_ids": [
+        28,
+        53,
+        18
+      ],
+      "id": 866398,
+      "original_language": "en",
+      "original_title": "The Beekeeper",
+      "overview": "One man’s campaign for vengeance takes on national stakes after he is revealed to be a former operative of a powerful and clandestine organization known as Beekeepers.",
+      "popularity": 3481.661,
+      "poster_path": "/A7EByudX0eOzlkQ2FIbogzyazm2.jpg",
+      "release_date": "2024-01-10",
+      "title": "The Beekeeper",
+      "video": false,
+      "vote_average": 7.4,
+      "vote_count": 634
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/pWsD91G2R1Da3AKM3ymr3UoIfRb.jpg",
+      "genre_ids": [
+        28,
+        878,
+        18
+      ],
+      "id": 933131,
+      "original_language": "ko",
+      "original_title": "황야",
+      "overview": "After a deadly earthquake turns Seoul into a lawless badland, a fearless huntsman springs into action to rescue a teenager abducted by a mad doctor.",
+      "popularity": 2373.914,
+      "poster_path": "/zVMyvNowgbsBAL6O6esWfRpAcOb.jpg",
+      "release_date": "2024-01-26",
+      "title": "Badland Hunters",
+      "video": false,
+      "vote_average": 7.099,
+      "vote_count": 171
+    }
+  ]
+}

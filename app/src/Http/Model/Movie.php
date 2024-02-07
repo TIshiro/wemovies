@@ -17,4 +17,17 @@ class Movie
     public int $voteCount;
     #[SerializedName('release_date')]
     public ?string $releaseDate;
+
+    public static function from(int $id, string $title, string $overview, float $voteAverage, int $voteCount,?string $releaseDate, ?string $posterPath): self
+    {
+        $obj = new self();
+        $obj->id = $id;
+        $obj->title = $title;
+        $obj->overview = $overview;
+        $obj->voteAverage = $voteAverage;
+        $obj->voteCount = $voteCount;
+        $obj->releaseDate = $releaseDate;
+        $obj->posterPath = $posterPath;
+        return $obj;
+    }
 }

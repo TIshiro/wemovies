@@ -66,5 +66,9 @@ composer install
 ```bash
 docker exec -it symfony-app-php bash
 
+##Integrations tests
+vendor/bin/simple-phpunit
+
+##Fucntionnals tests
 vendor/bin/behat
 ```
