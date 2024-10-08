@@ -1,123 +1,122 @@
-/*
- * Welcome to your app's main JavaScript file!
- *
- * This file will be included onto the page via the importmap() Twig function,
- * which should already be in your base.html.twig.
- */
-const onChecked = (checkbox) =>  {
-    const baseURL = 'http://localhost:8080';
-    if (checkbox.checked) {
-        const genreId = checkbox.value;
-        window.location.href = `${baseURL}/genre/${genreId}/movies`;
-    } else {
-        window.location.href = baseURL;
-    }
-}
+// Fonction pour gérer le changement de genre
+const onChecked = (checkbox) => {
+    const genreId = checkbox.value;
+    window.location.href = checkbox.checked ? `/genre/${genreId}/movies` : '/';
+};
+
 const selectGenre = () => {
-    const genres = document.querySelectorAll('input.cd_gender[type="checkbox"]');
-
-    genres.forEach(genre => {
-        genre.addEventListener('change', (event) => {
-            const target = event.target
-            onChecked(target);
-        });
+    document.querySelectorAll('input.cd_gender[type="checkbox"]').forEach(genre => {
+        genre.addEventListener('change', () => onChecked(genre));
     });
-}
+};
 
+// Fonction pour formater les votes
+const totalVote = (total) => `(${total} ${total > 1 ? 'utilisateurs' : 'utilisateur'})`;
 
-// Function to open the modal and display the content
-const totalVote = (total) =>  `(${total} ${total > 1 ? 'utilisateurs' : 'utilisateur'})`;
-
+// Fonction pour générer les étoiles de notation
 const starRate = (rating) => {
     const stars = ['☆☆☆☆☆', '★☆☆☆☆', '★★☆☆☆', '★★★☆☆', '★★★★☆', '★★★★★'];
-    const index = Math.floor(rating / 2);
-    if (index < 0) return stars[0];
-    if (index >= stars.length) return stars[stars.length - 1];
-
+    const index = Math.min(Math.max(Math.floor(rating / 2), 0), stars.length - 1);
     return stars[index];
-}
+};
 
+// Ouvre le modal et affiche les données du film
 const openModal = async (movieId) => {
     const modal = document.getElementById('movieModal');
     const movieTrailer = document.getElementById('movieTrailer');
     const noVideoMessage = document.getElementById('noVideoMessage');
 
-    // Show the modal initially
+    // Affiche le modal immédiatement
     modal.classList.remove('hidden');
 
     try {
-        // Fetch movie details
-        const movieResponse = await fetch(`http://localhost:8080/movie/${movieId}`);
-        const movieData = await movieResponse.json();
+        // Récupère les détails du film
+        const movieData = await fetchData(`/movie/${movieId}`);
+        updateModal(movieData);
 
-        // Fill modal with fetched data
-        document.getElementById('movieTitle').innerText = movieData.title;
-        document.getElementById('movieDescription').innerText = movieData.overview;
-        document.getElementById('ratingCount').innerText = `pour ${totalVote(movieData.vote_count)}`;
-        document.getElementById('ratingValue').innerText = starRate(movieData.vote_average);
+        // Essaye de récupérer la vidéo du film
+        const videoData = await fetchData(`/movie/${movieId}/video`);
 
-        // Fetch movie trailer
-        const videoResponse = await fetch(`http://localhost:8080/movie/${movieId}/video`);
-        const videoData = await videoResponse.json();
-
-        if (videoData && videoData.key) {
-            // Show trailer if available
-            movieTrailer.src = `https://www.youtube.com/embed/${videoData.key}?rel=0&autoplay=0&controls=1`;
+        if (videoData?.key) {
+            // Si une vidéo est disponible, on l'affiche
+            showVideo(videoData.key);
             movieTrailer.classList.remove('hidden');
             noVideoMessage.classList.add('hidden');
         } else {
-            // No video found
+            // Si aucune vidéo n'est trouvée, on affiche le message de non-disponibilité
             handleNoVideo();
         }
     } catch (error) {
-        console.error('Erreur lors de la récupération des données du film ou de la vidéo:', error);
+        console.error('Erreur lors de la récupération des données :', error);
         handleNoVideo();
     }
 };
 
+// Met à jour le contenu du modal avec les données du film
+const updateModal = (movieData) => {
+    document.getElementById('movieTitle').innerText = movieData.title;
+    document.getElementById('movieDescription').innerText = movieData.overview;
+    document.getElementById('ratingCount').innerText = `pour ${totalVote(movieData.vote_count)}`;
+    document.getElementById('ratingValue').innerText = starRate(movieData.vote_average);
+};
+
+// Gère l'absence de vidéo
 const handleNoVideo = () => {
-    // Show "no video" message and hide the trailer
     document.getElementById('noVideoMessage').classList.remove('hidden');
     document.getElementById('movieTrailer').classList.add('hidden');
 };
-// Function to close the modal
-const closeModal = () => {
-    document.getElementById('movieModal').classList.add('hidden');
-    document.getElementById('movieTrailer').src = "";  // Clear the trailer
+
+// Affiche la vidéo si elle est disponible
+const showVideo = (videoKey) => {
+    const movieTrailer = document.getElementById('movieTrailer');
+    movieTrailer.src = `https://www.youtube.com/embed/${videoKey}?rel=0&autoplay=0&controls=1`;
+    movieTrailer.classList.remove('hidden');
+    document.getElementById('noVideoMessage').classList.add('hidden');
 };
 
-// Add event listener to "Lire le détail" buttons
+// Ferme le modal
+const closeModal = () => {
+    document.getElementById('movieModal').classList.add('hidden');
+    document.getElementById('movieTrailer').src = '';  // Efface la vidéo
+};
+
+// Ajoute des écouteurs sur les boutons "Lire le détail"
 const addDetailButtonsEvent = () => {
-    const buttons = document.querySelectorAll('.detail-button');
-    buttons.forEach(button => {
-        button.addEventListener('click', () => {
-            const movieId = button.getAttribute('data-movie-id');
-            openModal(movieId);
-        });
+    document.querySelectorAll('.detail-button').forEach(button => {
+        button.addEventListener('click', () => openModal(button.getAttribute('data-movie-id')));
     });
 };
 
-// Add event listener to close button
-document.getElementById('closeModal').addEventListener('click', closeModal);
+// Récupère les données de l'API
+const fetchData = async (url) => {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
+    }
+    try {
+        return await response.json();
+    } catch (error) {
+        throw new Error(`Erreur de parsing JSON : ${error.message}`);
+    }
+};
 
-//Autocomplete
+// Gère les suggestions d'autocomplétion
 const searchInput = document.getElementById('movieSearch');
 const autocompleteList = document.getElementById('autocompleteResults');
 
 const updateAutocompleteList = (suggestions) => {
     autocompleteList.innerHTML = ''; // Vide la liste des suggestions précédentes
-    if (suggestions.length === 0) {
+    if (!suggestions.length) {
         autocompleteList.classList.add('hidden');
         return;
     }
 
-    // Affiche la liste des suggestions
     suggestions.forEach(suggestion => {
         const listItem = document.createElement('li');
         listItem.textContent = suggestion;
         listItem.addEventListener('click', () => {
-            searchInput.value = suggestion; // Met à jour l'input avec la suggestion sélectionnée
-            autocompleteList.classList.add('hidden'); // Cache la liste après la sélection
+            searchInput.value = suggestion;
+            autocompleteList.classList.add('hidden');
         });
         autocompleteList.appendChild(listItem);
     });
@@ -125,29 +124,27 @@ const updateAutocompleteList = (suggestions) => {
     autocompleteList.classList.remove('hidden');
 };
 
-const fetchAutocompleteSuggestions = (query) => {
-    fetch(`http://localhost:8080/autocomplete?q=${encodeURIComponent(query)}`)
-        .then(response => response.json())
-        .then(data => {
-            updateAutocompleteList(data);
-        })
-        .catch(error => {
-            console.error('Erreur lors de la récupération des suggestions :', error);
-        });
+const fetchAutocompleteSuggestions = async (query) => {
+    try {
+        const data = await fetchData(`/autocomplete?q=${encodeURIComponent(query)}`);
+        updateAutocompleteList(data);
+    } catch (error) {
+        console.error('Erreur lors de la récupération des suggestions :', error);
+    }
 };
 
 const autoComplete = () => {
     searchInput.addEventListener('input', () => {
         const query = searchInput.value.trim();
-        // Cache la liste si le nombre de caractères est inférieur à 3
         if (query.length < 3) {
             autocompleteList.classList.add('hidden');
             return;
         }
-
         fetchAutocompleteSuggestions(query);
     });
-}
+};
+
+document.getElementById('closeModal').addEventListener('click', closeModal);
 
 autoComplete();
 addDetailButtonsEvent();
