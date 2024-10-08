@@ -24,7 +24,7 @@ class AppController extends AbstractController
         $topRatedMovies = $this->theMovieDB->topRatedMovies();
         $topRatedMovie = array_shift($topRatedMovies);
         return $this->render(
-            'layouts/base.html.twig',
+            'base.html.twig',
             [
                 'h1' => 'À propos de We Movies',
                 'genres' => $this->theMovieDB->genres(),
@@ -45,7 +45,7 @@ class AppController extends AbstractController
         $movies = $this->theMovieDB->moviesByGenre($id);
         $topRatedMovie = array_shift($movies);
         return $this->render(
-            'layouts/base.html.twig',
+            'base.html.twig',
             [
                 'h1' => 'We movies: ' . ucfirst($genre->name),
                 'genre' => $genre,
@@ -62,7 +62,7 @@ class AppController extends AbstractController
     {
         $query  = $request->query->get('q');
         return $this->render(
-            'layouts/base.html.twig',
+            'base.html.twig',
             [
                 'h1' => 'We movies: Result for ' . $query,
                 'query' => $query,
