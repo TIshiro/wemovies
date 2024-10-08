@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Http\Model\Genre;
 use App\Http\Model\Movie;
+use App\Http\Model\Video;
 use App\Http\TheMovieDB;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,24 +15,19 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AppController extends AbstractController
 {
+    private array $genres;
+
     public function __construct(private readonly TheMovieDB $theMovieDB)
     {
+        $this->genres = $this->theMovieDB->genres(); // Récupérer les genres une seule fois
     }
 
     #[Route('/', name: 'app_home')]
     public function index(): Response
     {
-        $topRatedMovies = $this->theMovieDB->topRatedMovies();
-        $topRatedMovie = array_shift($topRatedMovies);
-        return $this->render(
-            'base.html.twig',
-            [
-                'h1' => 'À propos de We Movies',
-                'genres' => $this->theMovieDB->genres(),
-                'movies' => $topRatedMovies,
-                'topRatedMovie' => $topRatedMovie,
-                'topRatedMovieTeaser' => $topRatedMovie ? $this->theMovieDB->teaser($topRatedMovie->id) : null,
-            ]
+        return $this->renderMoviesPage(
+            'À propos de We Movies',
+            $this->theMovieDB->topRatedMovies()
         );
     }
 
@@ -40,42 +36,31 @@ class AppController extends AbstractController
     {
         $genre = $this->theMovieDB->genre($id);
         if (!$genre instanceof Genre) {
-           throw new NotFoundHttpException();
+            throw new NotFoundHttpException();
         }
-        $movies = $this->theMovieDB->moviesByGenre($id);
-        $topRatedMovie = array_shift($movies);
-        return $this->render(
-            'base.html.twig',
-            [
-                'h1' => 'We movies: ' . ucfirst($genre->name),
-                'genre' => $genre,
-                'genres' => $this->theMovieDB->genres(),
-                'movies' => $movies,
-                'topRatedMovie' => $topRatedMovie,
-                'topRatedMovieTeaser' => $topRatedMovie ? $this->theMovieDB->teaser($topRatedMovie->id) : null,
-            ]
+        return $this->renderMoviesPage(
+            'We movies: ' . ucfirst($genre->name),
+            $this->theMovieDB->moviesByGenre($id),
+            $genre
         );
     }
 
     #[Route('/search', name: 'app_search')]
     public function search(Request $request): Response
     {
-        $query  = $request->query->get('q');
-        return $this->render(
-            'base.html.twig',
-            [
-                'h1' => 'We movies: Result for ' . $query,
-                'query' => $query,
-                'genres' => $this->theMovieDB->genres(),
-                'movies' => $this->theMovieDB->movies($query),
-            ]
+        $query = $request->query->get('q');
+        return $this->renderMoviesPage(
+            'We movies: Result for ' . $query,
+            $this->theMovieDB->movies($query),
+            null,
+            $query
         );
     }
 
     #[Route('/autocomplete', name: 'app_autocomplete')]
     public function autocomplete(Request $request): JsonResponse
     {
-        $query  = $request->query->get('q');
+        $query = $request->query->get('q');
         return $this->json($this->theMovieDB->autocomplete($query));
     }
 
@@ -87,5 +72,31 @@ class AppController extends AbstractController
             throw new NotFoundHttpException();
         }
         return $this->json($movie);
+    }
+
+    #[Route('/movie/{id}/video', name: 'app_movie_video')]
+    public function movieVideo(int $id): JsonResponse
+    {
+        $teaser = $this->theMovieDB->teaser($id);
+        if (!$teaser instanceof Video) {
+            throw new NotFoundHttpException();
+        }
+        return $this->json($teaser);
+    }
+
+    private function renderMoviesPage(string $h1, array $movies, ?Genre $genre = null, ?string $query = null): Response
+    {
+        $topRatedMovie = array_shift($movies);
+        $topRatedMovieTeaser = $topRatedMovie ? $this->theMovieDB->teaser($topRatedMovie->id) : null;
+
+        return $this->render('base.html.twig', [
+            'h1' => $h1,
+            'genres' => $this->genres,
+            'movies' => $movies,
+            'topRatedMovie' => $topRatedMovie,
+            'topRatedMovieTeaser' => $topRatedMovieTeaser,
+            'genre' => $genre,
+            'query' => $query,
+        ]);
     }
 }

@@ -83,6 +83,10 @@
                     {{ stars[videoRate] ?? stars[0] }} {# Utilisation d'un tableau pour mapper les valeurs de videoRate aux étoiles #}
                 {% endmacro %}
 
+                {% macro totalVote(total) %}
+                    {{ '(' ~ total ~ (total > 1 ? ' votes' : ' vote') ~ ')' }}
+                {% endmacro %}
+
                 {% import _self as macros %}
                 {% set source = 'https://image.tmdb.org/t/p/w342' ~ ((movie.posterPath is defined and movie.posterPath is not null) ? movie.posterPath : '/bvYjhsbxOBwpm8xLE5BhdA3a8CZ.jpg') %}
 
@@ -94,14 +98,14 @@
                             <h3 class="font-semibold text-xl">{{ movie.title }}</h3>
                             <div class="pl-5 flex items-center">
                                 <span class="text-blue-400">{{ macros.videoRate(movie.voteAverage) }}</span>
-                                <span class="ml-2 text-sm text-gray-500">  ({{ movie.voteCount }})</span>
+                                <span class="ml-2 text-sm text-gray-500">{{ macros.totalVote(movie.voteCount) }}</span>
                             </div>
                         </div>
                         <div class="text-gray-500 text-sm">{{ movie.releaseDate|date('Y') }}</div>
                         <p class="text-sm text-gray-700 mt-2">{{ macros.truncateText(movie.overview, 30) }}</p>
                     </div>
                     <div class="flex justify-end">
-                        <button class="bg-blue-500 text-white px-4 py-2 rounded rounded-full">Lire le détail</button>
+                        <button class="detail-button bg-blue-500 text-white px-4 py-2 rounded-full" data-movie-id="{{ movie.id }}">Lire le détail</button>
                     </div>
                 </div>
             </div>
@@ -109,6 +113,33 @@
                 <div>Sorry, no movie seems to be found for your search!</div>
             {% endfor %}
         </section>
+    </div>
+
+    <!-- Modal Structure (Hidden by default) -->
+    <div id="movieModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white w-3/4 max-w-2xl p-6 rounded-lg shadow-lg relative">
+            <button id="closeModal" class="absolute top-4 right-4 text-gray-600 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto hover:text-black rounded rounded-full border border-2 border-gray-300 dark:hover:bg-gray-600 dark:hover:text-white">
+                &times;
+            </button>
+            <div id="modalContent" class="flex py-10 flex-col items-center">
+                <!-- YouTube Video -->
+                <iframe id="movieTrailer" class="w-full h-64 mb-4" src=""
+                        title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen class="w-full rounded-lg shadow-md">
+                </iframe>
+                <!-- Movie Title -->
+                <h3 id="movieTitle" class="text-xl font-semibold mb-2"></h3>
+
+                <!-- Movie Rating -->
+                <div id="movieRating" class="flex items-center mb-4">
+                    <span class="ml-2 text-yellow-500 text-xl" id="ratingValue"></span>
+                    <span class="ml-2 text-gray-500 text-sm" id="ratingCount"></span>
+                </div>
+
+                <!-- Movie Description -->
+                <p id="movieDescription" class="text-gray-700"></p>
+            </div>
+        </div>
     </div>
 </main>
 </body>

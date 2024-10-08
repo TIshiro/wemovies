@@ -16,109 +16,109 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 readonly class TheMovieDB
 {
+    private const API_BASE_PATH = '/3';
+    private array $genresCache;
+
     public function __construct(
         private HttpClientInterface $theMovieDBApi,
         private SerializerInterface $serializer,
-        private LoggerInterface     $logger
+        private LoggerInterface $logger
     ) {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
-
     }
 
     /**
      * @throws TransportExceptionInterface
      */
-    public function get(string $path, array $options = []): ResponseInterface
+    private function get(string $path, array $options = []): ResponseInterface
     {
-        return $this->theMovieDBApi->request(
-            'GET',
-            $path,
-            $options
-        );
+        return $this->theMovieDBApi->request('GET', self::API_BASE_PATH . $path, $options);
     }
 
     /**
      * @throws TransportExceptionInterface
      */
-    public function handleResponse(ResponseInterface $response, string $type, array $context): mixed
+    private function handleResponse(ResponseInterface $response, string $type, array $context): mixed
     {
-        if (200 != $response->getStatusCode()) {
+        if ($response->getStatusCode() !== 200) {
             return null;
         }
+
         try {
-            return $this->serializer->deserialize(
-                $response->getContent(),
-                $type,
-                'json',
-                $context
-            );
+            return $this->serializer->deserialize($response->getContent(), $type, 'json', $context);
         } catch (\Throwable $exception) {
-            $this->logger->error(
-                $exception->getMessage(),
-                ['file' => $exception->getFile(), 'line' => $exception->getLine()]
-            );
+            $this->logError($exception);
             return null;
         }
+    }
+
+    private function logError(\Throwable $exception): void
+    {
+        $this->logger->error($exception->getMessage(), [
+            'file' => $exception->getFile(),
+            'line' => $exception->getLine(),
+        ]);
     }
 
     public function genres(): array
     {
-        return $this->handleResponse(
-            $this->get('/3/genre/movie/list'),
-            Genre::class.'[]',
-            [BaseNormalizer::NORMALIZATION_CONTEXT_KEY => BaseNormalizer::GENRES_COLLECTION_NORMALIZATION_CONTEXT]
-        );
+        if (empty($this->genresCache)) {
+            $this->genresCache = $this->handleResponse(
+                $this->get('/genre/movie/list'),
+                Genre::class . '[]',
+                [BaseNormalizer::NORMALIZATION_CONTEXT_KEY => BaseNormalizer::GENRES_COLLECTION_NORMALIZATION_CONTEXT]
+            ) ?? [];
+        }
+        return $this->genresCache;
     }
 
     public function genre(int $id): ?Genre
     {
         $genres = $this->genres();
-        $filteredGenres = array_filter($genres, fn($genre) => $id == $genre->id);
-
-        return reset($filteredGenres) ?: null;
+        foreach ($genres as $genre) {
+            if ($genre->id === $id) {
+                return $genre;
+            }
+        }
+        return null;
     }
 
     public function topRatedMovies(): array
     {
-        return $this->handleResponse(
-            $this->get('/3/movie/top_rated', ['query' => ['page' => 1]]),
-            Movie::class.'[]',
-            [BaseNormalizer::NORMALIZATION_CONTEXT_KEY => BaseNormalizer::MOVIES_COLLECTION_NORMALIZATION_CONTEXT]
-        );
+        return $this->fetchMovies('/movie/top_rated');
     }
 
     public function movies(string $query, int $page = 1): array
     {
-        return $this->search(
-            '/3/search/movie',
-            [
-                'query' => $query,
-                'include_adult' => false,
-                'sort_by' => 'popularity.desc',
-                'page' => $page
-            ]
-        );
+        return $this->search('/search/movie', [
+            'query' => $query,
+            'include_adult' => false,
+            'sort_by' => 'popularity.desc',
+            'page' => $page,
+        ]);
     }
 
     public function search(string $path, array $filters): array
     {
-        return $this->handleResponse(
-            $this->get($path, ['query' => $filters]),
-            Movie::class.'[]',
-            [BaseNormalizer::NORMALIZATION_CONTEXT_KEY => BaseNormalizer::MOVIES_COLLECTION_NORMALIZATION_CONTEXT]
-        );
+        return $this->fetchMovies($path, $filters);
     }
 
     public function moviesByGenre(int $genreID): array
     {
-        return $this->search(
-            '/3/discover/movie',
-            [
-                'with_genres' => $genreID,
-                'include_adult' => false,
-                'sort_by' => 'popularity.desc',
-            ]
-        );
+        return $this->fetchMovies('/discover/movie', [
+            'with_genres' => $genreID,
+            'include_adult' => false,
+            'sort_by' => 'popularity.desc',
+        ]);
+    }
+
+    private function fetchMovies(string $path, array $filters = []): array
+    {
+        return $this->handleResponse(
+            $this->get($path, ['query' => $filters]),
+            Movie::class . '[]',
+            [BaseNormalizer::NORMALIZATION_CONTEXT_KEY => BaseNormalizer::MOVIES_COLLECTION_NORMALIZATION_CONTEXT]
+        ) ?? [];
     }
 
     public function autocomplete(string $query): array
@@ -130,7 +130,7 @@ readonly class TheMovieDB
     public function movie(int $id): ?Movie
     {
         return $this->handleResponse(
-            $this->get('/3/movie/'.$id),
+            $this->get('/movie/' . $id),
             Movie::class,
             []
         );
@@ -139,8 +139,8 @@ readonly class TheMovieDB
     public function teaser(int $movieId): ?Video
     {
         $trailers = $this->handleResponse(
-            $this->get('/3/movie/'.$movieId.'/videos', ['query' => ['language' => 'en-US']]),
-            Video::class.'[]',
+            $this->get('/movie/' . $movieId . '/videos', ['query' => ['language' => 'en-US']]),
+            Video::class . '[]',
             [BaseNormalizer::NORMALIZATION_CONTEXT_KEY => BaseNormalizer::VIDEOS_COLLECTION_NORMALIZATION_CONTEXT]
         );
 
