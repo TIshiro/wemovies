@@ -24,7 +24,7 @@ class AppController extends AbstractController
         $topRatedMovies = $this->theMovieDB->topRatedMovies();
         $topRatedMovie = array_shift($topRatedMovies);
         return $this->render(
-            'layouts/base.html.twig',
+            'base.html.twig',
             [
                 'h1' => 'À propos de We Movies',
                 'genres' => $this->theMovieDB->genres(),
@@ -42,14 +42,17 @@ class AppController extends AbstractController
         if (!$genre instanceof Genre) {
            throw new NotFoundHttpException();
         }
-
+        $movies = $this->theMovieDB->moviesByGenre($id);
+        $topRatedMovie = array_shift($movies);
         return $this->render(
-            'layouts/base.html.twig',
+            'base.html.twig',
             [
                 'h1' => 'We movies: ' . ucfirst($genre->name),
                 'genre' => $genre,
                 'genres' => $this->theMovieDB->genres(),
-                'movies' => $this->theMovieDB->moviesByGenre($id),
+                'movies' => $movies,
+                'topRatedMovie' => $topRatedMovie,
+                'topRatedMovieTeaser' => $topRatedMovie ? $this->theMovieDB->teaser($topRatedMovie->id) : null,
             ]
         );
     }
@@ -59,7 +62,7 @@ class AppController extends AbstractController
     {
         $query  = $request->query->get('q');
         return $this->render(
-            'layouts/base.html.twig',
+            'base.html.twig',
             [
                 'h1' => 'We movies: Result for ' . $query,
                 'query' => $query,
