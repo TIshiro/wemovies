@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Http\Model\Genre;
 use App\Http\Model\Movie;
+use App\Http\Model\Video;
 use App\Http\TheMovieDB;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -87,5 +88,15 @@ class AppController extends AbstractController
             throw new NotFoundHttpException();
         }
         return $this->json($movie);
+    }
+
+    #[Route('/movie/{id}/video', name: 'app_movie_video')]
+    public function movieVideo(int $id): JsonResponse
+    {
+        $teaser = $this->theMovieDB->teaser($id);
+        if (!$teaser instanceof Video) {
+            throw new NotFoundHttpException();
+        }
+        return $this->json($teaser);
     }
 }
