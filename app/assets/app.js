@@ -37,35 +37,49 @@ const starRate = (rating) => {
     return stars[index];
 }
 
-const openModal = (movieId) => {
-    // Fetch movie details from the API
-    document.getElementById('movieModal').classList.remove('hidden');
+const openModal = async (movieId) => {
+    const modal = document.getElementById('movieModal');
+    const movieTrailer = document.getElementById('movieTrailer');
+    const noVideoMessage = document.getElementById('noVideoMessage');
 
-    fetch(`http://localhost:8080/movie/${movieId}`)
-        .then(response => response.json())
-        .then(data => {
-            // Fill modal with fetched data
-            document.getElementById('movieTitle').innerText = data.title;
-            document.getElementById('movieDescription').innerText = data.overview;
-            document.getElementById('ratingCount').innerText = `pour ${totalVote(data.vote_count)}`;
-            document.getElementById('ratingValue').innerText = starRate(data.vote_average);
-            fetch(`http://localhost:8080/movie/${movieId}/video`)
-                .then(response => response.json())
-                .then(videoData => {
-                    document.getElementById('movieTrailer').src = `https://www.youtube.com/embed/${videoData.key}?rel=0&autoplay=0&controls=1`;
-                }
-            ).catch(error => {
-                console.error('Erreur lors de la récupération des données de la vidéo du film:', error);
-            });
+    // Show the modal initially
+    modal.classList.remove('hidden');
 
-            // Display the modal
-            document.getElementById('movieModal').classList.remove('hidden');
-        })
-        .catch(error => {
-            console.error('Erreur lors de la récupération des données du film:', error);
-        });
+    try {
+        // Fetch movie details
+        const movieResponse = await fetch(`http://localhost:8080/movie/${movieId}`);
+        const movieData = await movieResponse.json();
+
+        // Fill modal with fetched data
+        document.getElementById('movieTitle').innerText = movieData.title;
+        document.getElementById('movieDescription').innerText = movieData.overview;
+        document.getElementById('ratingCount').innerText = `pour ${totalVote(movieData.vote_count)}`;
+        document.getElementById('ratingValue').innerText = starRate(movieData.vote_average);
+
+        // Fetch movie trailer
+        const videoResponse = await fetch(`http://localhost:8080/movie/${movieId}/video`);
+        const videoData = await videoResponse.json();
+
+        if (videoData && videoData.key) {
+            // Show trailer if available
+            movieTrailer.src = `https://www.youtube.com/embed/${videoData.key}?rel=0&autoplay=0&controls=1`;
+            movieTrailer.classList.remove('hidden');
+            noVideoMessage.classList.add('hidden');
+        } else {
+            // No video found
+            handleNoVideo();
+        }
+    } catch (error) {
+        console.error('Erreur lors de la récupération des données du film ou de la vidéo:', error);
+        handleNoVideo();
+    }
 };
 
+const handleNoVideo = () => {
+    // Show "no video" message and hide the trailer
+    document.getElementById('noVideoMessage').classList.remove('hidden');
+    document.getElementById('movieTrailer').classList.add('hidden');
+};
 // Function to close the modal
 const closeModal = () => {
     document.getElementById('movieModal').classList.add('hidden');

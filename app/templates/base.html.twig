@@ -139,6 +139,12 @@
                         title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowfullscreen class="w-full rounded-lg shadow-md">
                 </iframe>
+
+                <div id="noVideoMessage" class="hidden text-center">
+                    <img src="{{ asset('images/no-video.svg') }}" alt="No Video Available" class="w-24 h-24 mx-auto">
+                    <p>Désolé, aucune vidéo ne semble être disponible.</p>
+                </div>
+                
                 <!-- Movie Title -->
                 <h3 id="movieTitle" class="text-xl font-semibold mb-2"></h3>
 
