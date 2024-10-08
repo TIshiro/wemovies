@@ -13,11 +13,9 @@
         <h1 class="text-xl font-bold">{{ h1 }}</h1>
         <div class="relative">
             <form action="{{ path('app_search') }}" class="relative">
-                <input type="text" required placeholder="Rechercher un film..." class="border border-gray-300 rounded px-4 py-2" name="q">
-                <button class="absolute right-8 top-1 text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l5 5m-5-5a7 7 0 1114 0 7 7 0 01-14 0z" />
-                    </svg>
+                <input type="text" required placeholder="Search a movie..." class="border border-gray-300 rounded px-4 py-2" name="q">
+                <button class="absolute right-3 top-2 text-gray-600">
+                    <img src="{{ asset('images/magnifying-glass.svg') }}" alt="magnifying glass" class="w-6 h-6">
                 </button>
             </form>
         </div>
@@ -105,4 +103,7 @@
     </div>
 </main>
 </body>
+{% block javascripts %}
+    {% block importmap %}{{ importmap('app') }}{% endblock %}
+{% endblock %}
 </html>
