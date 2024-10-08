@@ -64,7 +64,9 @@ readonly class TheMovieDB
     {
         if (empty($this->genresCache)) {
             $this->genresCache = $this->handleResponse(
-                $this->get('/genre/movie/list'),
+                $this->get('/genre/movie/list',
+                    ['query' => ['language' => 'en']]
+                ),
                 Genre::class . '[]',
                 [BaseNormalizer::NORMALIZATION_CONTEXT_KEY => BaseNormalizer::GENRES_COLLECTION_NORMALIZATION_CONTEXT]
             ) ?? [];
@@ -93,6 +95,7 @@ readonly class TheMovieDB
         return $this->search('/search/movie', [
             'query' => $query,
             'include_adult' => false,
+            'language' => 'en-US',
             'sort_by' => 'popularity.desc',
             'page' => $page,
         ]);
@@ -108,6 +111,7 @@ readonly class TheMovieDB
         return $this->fetchMovies('/discover/movie', [
             'with_genres' => $genreID,
             'include_adult' => false,
+            'language' => 'en-US',
             'sort_by' => 'popularity.desc',
         ]);
     }

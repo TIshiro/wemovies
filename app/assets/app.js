@@ -52,7 +52,6 @@ const openModal = (movieId) => {
             fetch(`http://localhost:8080/movie/${movieId}/video`)
                 .then(response => response.json())
                 .then(videoData => {
-                    console.log(videoData);
                     document.getElementById('movieTrailer').src = `https://www.youtube.com/embed/${videoData.key}?rel=0&autoplay=0&controls=1`;
                 }
             ).catch(error => {
@@ -87,5 +86,55 @@ const addDetailButtonsEvent = () => {
 // Add event listener to close button
 document.getElementById('closeModal').addEventListener('click', closeModal);
 
+//Autocomplete
+const searchInput = document.getElementById('movieSearch');
+const autocompleteList = document.getElementById('autocompleteResults');
+
+const updateAutocompleteList = (suggestions) => {
+    autocompleteList.innerHTML = ''; // Vide la liste des suggestions précédentes
+    if (suggestions.length === 0) {
+        autocompleteList.classList.add('hidden');
+        return;
+    }
+
+    // Affiche la liste des suggestions
+    suggestions.forEach(suggestion => {
+        const listItem = document.createElement('li');
+        listItem.textContent = suggestion;
+        listItem.addEventListener('click', () => {
+            searchInput.value = suggestion; // Met à jour l'input avec la suggestion sélectionnée
+            autocompleteList.classList.add('hidden'); // Cache la liste après la sélection
+        });
+        autocompleteList.appendChild(listItem);
+    });
+
+    autocompleteList.classList.remove('hidden');
+};
+
+const fetchAutocompleteSuggestions = (query) => {
+    fetch(`http://localhost:8080/autocomplete?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            updateAutocompleteList(data);
+        })
+        .catch(error => {
+            console.error('Erreur lors de la récupération des suggestions :', error);
+        });
+};
+
+const autoComplete = () => {
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim();
+        // Cache la liste si le nombre de caractères est inférieur à 3
+        if (query.length < 3) {
+            autocompleteList.classList.add('hidden');
+            return;
+        }
+
+        fetchAutocompleteSuggestions(query);
+    });
+}
+
+autoComplete();
 addDetailButtonsEvent();
 selectGenre();

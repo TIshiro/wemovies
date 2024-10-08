@@ -18,7 +18,10 @@
         <h1 class="text-xl font-bold">{{ h1 }}</h1>
         <div class="relative">
             <form action="{{ path('app_search') }}" class="relative">
-                <input type="text" required placeholder="Search a movie..." class="border border-gray-300 rounded px-4 py-2" name="q">
+                <label for="movieSearch"></label><input type="text" id="movieSearch" required placeholder="Search a movie..." class="border border-gray-300 rounded px-4 py-2 w-full" name="q" autocomplete="off">
+                <ul id="autocompleteResults" class=" autocomplete-suggestions absolute z-10 bg-white border border-gray-300 rounded mt-1 w-full hidden">
+                    <!-- Suggestions will appear here -->
+                </ul>
                 <button class="absolute right-3 top-2 text-gray-600">
                     <img src="{{ asset('images/magnifying-glass.svg') }}" alt="magnifying glass" class="w-6 h-6">
                 </button>
@@ -110,7 +113,9 @@
                 </div>
             </div>
             {% else %}
-                <div>Sorry, no movie seems to be found for your search!</div>
+                {% if topRatedMovie is null %}
+                <div class="bg-yellow-200 p-4 rounded-lg shadow-md mb-6 flex text-gray-700">Sorry, no movie seems to be found for your search!</div>
+                {% endif %}
             {% endfor %}
         </section>
     </div>
