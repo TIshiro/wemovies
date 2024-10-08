@@ -42,14 +42,17 @@ class AppController extends AbstractController
         if (!$genre instanceof Genre) {
            throw new NotFoundHttpException();
         }
-
+        $movies = $this->theMovieDB->moviesByGenre($id);
+        $topRatedMovie = array_shift($movies);
         return $this->render(
             'layouts/base.html.twig',
             [
                 'h1' => 'We movies: ' . ucfirst($genre->name),
                 'genre' => $genre,
                 'genres' => $this->theMovieDB->genres(),
-                'movies' => $this->theMovieDB->moviesByGenre($id),
+                'movies' => $movies,
+                'topRatedMovie' => $topRatedMovie,
+                'topRatedMovieTeaser' => $topRatedMovie ? $this->theMovieDB->teaser($topRatedMovie->id) : null,
             ]
         );
     }
