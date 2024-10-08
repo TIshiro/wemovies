@@ -89,6 +89,10 @@ class AppController extends AbstractController
         $topRatedMovie = array_shift($movies);
         $topRatedMovieTeaser = $topRatedMovie ? $this->theMovieDB->teaser($topRatedMovie->id) : null;
 
+        if (!$topRatedMovieTeaser && $topRatedMovie) {
+            array_unshift($movies, $topRatedMovie);
+        }
+
         return $this->render('base.html.twig', [
             'h1' => $h1,
             'genres' => $this->genres,
