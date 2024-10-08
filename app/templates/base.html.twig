@@ -55,7 +55,11 @@
             <ul class="mt-4 space-y-2">
                 {% set selected_genre = genre|default(null) %}
                 {% for genre in genres %}
-                    <li><label><input type="checkbox" {% if selected_genre is not null and selected_genre.id == genre.id %}checked{% endif%} class="mr-2">{{ genre.name }}</label></li>
+                    <li>
+                        <label>
+                            <input type="checkbox" value="{{ genre.id }}" {% if selected_genre is not null and selected_genre.id == genre.id %}checked{% endif%} class="mr-2 cd_gender">{{ genre.name }}
+                        </label>
+                    </li>
                 {% endfor %}
             </ul>
         </aside>
