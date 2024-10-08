@@ -4,8 +4,11 @@ namespace App\Http;
 
 use App\Http\Model\Genre;
 use App\Http\Model\Movie;
+use App\Http\Model\Video;
 use App\Serializer\BaseNormalizer;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -18,6 +21,8 @@ readonly class TheMovieDB
         private SerializerInterface $serializer,
         private LoggerInterface     $logger
     ) {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+
     }
 
     /**
@@ -64,6 +69,7 @@ readonly class TheMovieDB
             [BaseNormalizer::NORMALIZATION_CONTEXT_KEY => BaseNormalizer::GENRES_COLLECTION_NORMALIZATION_CONTEXT]
         );
     }
+
     public function genre(int $id): ?Genre
     {
         $genres = $this->genres();
@@ -78,6 +84,19 @@ readonly class TheMovieDB
             $this->get('/3/movie/top_rated', ['query' => ['page' => 1]]),
             Movie::class.'[]',
             [BaseNormalizer::NORMALIZATION_CONTEXT_KEY => BaseNormalizer::MOVIES_COLLECTION_NORMALIZATION_CONTEXT]
+        );
+    }
+
+    public function movies(string $query, int $page = 1): array
+    {
+        return $this->search(
+            '/3/search/movie',
+            [
+                'query' => $query,
+                'include_adult' => false,
+                'sort_by' => 'popularity.desc',
+                'page' => $page
+            ]
         );
     }
 
@@ -102,19 +121,6 @@ readonly class TheMovieDB
         );
     }
 
-    public function movies(string $query, int $page = 1): array
-    {
-        return $this->search(
-            '/3/search/movie',
-            [
-                'query' => $query,
-                'include_adult' => false,
-                'sort_by' => 'popularity.desc',
-                'page' => $page
-            ]
-        );
-    }
-
     public function autocomplete(string $query): array
     {
         $movies = $this->movies($query);
@@ -128,5 +134,16 @@ readonly class TheMovieDB
             Movie::class,
             []
         );
+    }
+
+    public function teaser(int $movieId): ?Video
+    {
+        $trailers = $this->handleResponse(
+            $this->get('/3/movie/'.$movieId.'/videos', ['query' => ['language' => 'en-US']]),
+            Video::class.'[]',
+            [BaseNormalizer::NORMALIZATION_CONTEXT_KEY => BaseNormalizer::VIDEOS_COLLECTION_NORMALIZATION_CONTEXT]
+        );
+
+        return array_shift($trailers) ?: null;
     }
 }

@@ -21,12 +21,16 @@ class AppController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(): Response
     {
+        $topRatedMovies = $this->theMovieDB->topRatedMovies();
+        $topRatedMovie = array_shift($topRatedMovies);
         return $this->render(
             'layouts/base.html.twig',
             [
-                'h1' => 'We movies',
+                'h1' => 'À propos de We Movies',
                 'genres' => $this->theMovieDB->genres(),
-                'movies' => $this->theMovieDB->topRatedMovies(),
+                'movies' => $topRatedMovies,
+                'topRatedMovie' => $topRatedMovie,
+                'topRatedMovieTeaser' => $topRatedMovie ? $this->theMovieDB->teaser($topRatedMovie->id) : null,
             ]
         );
     }
