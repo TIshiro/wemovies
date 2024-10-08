@@ -12,12 +12,14 @@
     <div class="container mx-auto flex items-center justify-between">
         <h1 class="text-xl font-bold">{{ h1 }}</h1>
         <div class="relative">
-            <input type="text" placeholder="Rechercher un film..." class="border border-gray-300 rounded px-4 py-2">
-            <button class="absolute right-2 top-2 text-gray-600">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l5 5m-5-5a7 7 0 1114 0 7 7 0 01-14 0z" />
-                </svg>
-            </button>
+            <form action="{{ path('app_search') }}" class="relative">
+                <input type="text" required placeholder="Rechercher un film..." class="border border-gray-300 rounded px-4 py-2" name="q">
+                <button class="absolute right-8 top-1 text-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l5 5m-5-5a7 7 0 1114 0 7 7 0 01-14 0z" />
+                    </svg>
+                </button>
+            </form>
         </div>
     </div>
 </header>
@@ -25,6 +27,10 @@
 <!-- Main Content -->
 <main class="container mx-auto mt-8">
     <!-- Video Section -->
+    {% set topRatedMovieTeaser = topRatedMovieTeaser|default(null) %}
+    {% set topRatedMovie = topRatedMovie|default(null) %}
+
+    {% if topRatedMovieTeaser and topRatedMovie %}
     <section class="flex justify-center">
         <div class="relative w-full max-w-4xl">
             <iframe width="1133" height="500" src="https://www.youtube.com/embed/{{ topRatedMovieTeaser.key }}?rel=0&autoplay=0&controls=1"
@@ -37,7 +43,7 @@
             </div>
         </div>
     </section>
-
+    {% endif %}
     <!-- Filter and Movie List -->
     <div class="flex mt-10">
         <!-- Filter Section -->
@@ -84,7 +90,7 @@
                                 <span class="ml-2 text-sm text-gray-500">  ({{ movie.voteCount }})</span>
                             </div>
                         </div>
-                        <div class="text-gray-500 text-sm">{{ movie.releaseDate|date('Y') }} - Disney, Pixar</div>
+                        <div class="text-gray-500 text-sm">{{ movie.releaseDate|date('Y') }}</div>
                         <p class="text-sm text-gray-700 mt-2">{{ macros.truncateText(movie.overview, 30) }}</p>
                     </div>
                     <div class="flex justify-end">
@@ -92,6 +98,8 @@
                     </div>
                 </div>
             </div>
+            {% else %}
+                <div>Sorry, no movie seems to be found for your search!</div>
             {% endfor %}
         </section>
     </div>
