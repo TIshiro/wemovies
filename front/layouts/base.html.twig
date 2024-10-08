@@ -63,6 +63,13 @@
                         {{ text }}
                     {% endif %}
                 {% endmacro %}
+
+                {% macro videoRate(rate) %}
+                    {% set videoRate = rate // 2 %} {# Utilisation de la division entière pour s'assurer que le résultat est un entier #}
+                    {% set stars = ['☆☆☆☆☆', '★☆☆☆☆', '★★☆☆☆', '★★★☆☆', '★★★★☆', '★★★★★'] %}
+                    {{ stars[videoRate] ?? stars[0] }} {# Utilisation d'un tableau pour mapper les valeurs de videoRate aux étoiles #}
+                {% endmacro %}
+
                 {% import _self as macros %}
                 {% set source = 'https://image.tmdb.org/t/p/w342' ~ ((movie.posterPath is defined and movie.posterPath is not null) ? movie.posterPath : '/bvYjhsbxOBwpm8xLE5BhdA3a8CZ.jpg') %}
 
@@ -73,8 +80,8 @@
                         <div class="flex mt-2">
                             <h3 class="font-semibold text-xl">{{ movie.title }}</h3>
                             <div class="pl-5 flex items-center">
-                                <span class="text-blue-400">★★★★☆</span>
-                                <span class="ml-2 text-sm text-gray-500"> {{ movie.voteAverage }} ({{ movie.voteCount }})</span>
+                                <span class="text-blue-400">{{ macros.videoRate(movie.voteAverage) }}</span>
+                                <span class="ml-2 text-sm text-gray-500">  ({{ movie.voteCount }})</span>
                             </div>
                         </div>
                         <div class="text-gray-500 text-sm">{{ movie.releaseDate|date('Y') }} - Disney, Pixar</div>
