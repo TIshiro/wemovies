@@ -4,6 +4,7 @@ namespace App\Tests\Integration\Serializer;
 
 use App\Http\Model\Genre;
 use App\Http\Model\Movie;
+use App\Http\Model\Video;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -59,6 +60,21 @@ class CollectionsNormalizerTest extends KernelTestCase
         $this->assertEquals(
             $expectedResult,
             $this->serializer->deserialize($data, Movie::class . '[]', 'json', ['normalization' => 'MOVIES_COLLECTION_NORMALIZATION'])
+        );
+    }
+
+    public function testDenormalizeVideos(): void
+    {
+        $data =file_get_contents(__DIR__.'/Dummies/videos.json');
+
+        $expectedResult = [
+            1 => Video::from("66e34a889013fe872223b9a6", "Available September 25 on Disney+", "QGFELnpig2M"),
+            3 => Video::from("66b57b08402939255ad7c119", "Announce Trailer", "u69y5Ie519M")
+        ];
+
+        $this->assertEquals(
+            $expectedResult,
+            $this->serializer->deserialize($data, Video::class . '[]', 'json', ['normalization' => 'VIDEOS_COLLECTION_NORMALIZATION'])
         );
     }
 }
