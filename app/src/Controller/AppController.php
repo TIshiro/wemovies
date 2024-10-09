@@ -22,13 +22,6 @@ class AppController extends AbstractController
         $this->genres = $this->theMovieDB->genres(); // Récupérer les genres une seule fois
     }
 
-    #[Route('/autocomplete', name: 'app_autocomplete')]
-    public function autocomplete(Request $request): JsonResponse
-    {
-        $query = $request->query->get('q');
-        return $this->json($this->theMovieDB->autocomplete($query));
-    }
-
     #[Route('/movie/{id}', name: 'app_movie')]
     public function movie(int $id): JsonResponse
     {
