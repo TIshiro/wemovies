@@ -4,7 +4,7 @@ namespace App\Message;
 
 use App\Http\Model\Genre;
 
-class GetGenreContentMessage implements MessageInterface
+readonly class GetGenreContentMessage implements MessageInterface
 {
     public function __construct(private Genre $genre)
     {

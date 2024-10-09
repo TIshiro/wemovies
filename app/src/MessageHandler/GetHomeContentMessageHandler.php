@@ -10,26 +10,18 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler]
 readonly class GetHomeContentMessageHandler
 {
+    use ResponseTrait;
+
     public function __construct(private TheMovieDB $theMovieDB)
     {
     }
 
     public function __invoke(GetHomeContentMessage $message): GetHomeContentResponse
     {
-        $topRatedMovies = $this->theMovieDB->topRatedMovies();
-        $topRatedMovie = array_shift($topRatedMovies);
-        $topRatedMovieTeaser = $topRatedMovie ? $this->theMovieDB->teaser($topRatedMovie->id) : null;
-
-        if (!$topRatedMovieTeaser && $topRatedMovie) {
-            array_unshift($topRatedMovies, $topRatedMovie);
-        }
-
-        return new GetHomeContentResponse(
+        return $this->render(
+            GetHomeContentResponse::class,
             GetHomeContentResponse::H1,
-            $this->theMovieDB->genres(),
-            $topRatedMovies,
-            $topRatedMovie,
-            $topRatedMovieTeaser,
+            $this->theMovieDB->topRatedMovies()
         );
     }
 }
