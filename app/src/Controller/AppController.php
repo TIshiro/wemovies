@@ -22,14 +22,6 @@ class AppController extends AbstractController
         $this->genres = $this->theMovieDB->genres(); // Récupérer les genres une seule fois
     }
 
-    #[Route('/', name: 'app_home')]
-    public function index(): Response
-    {
-        return $this->renderMoviesPage(
-            'À propos de We Movies',
-            $this->theMovieDB->topRatedMovies()
-        );
-    }
 
     #[Route('/genre/{id}/movies', name: 'app_movies_by_genre')]
     public function moviesByGenre(int $id): Response
