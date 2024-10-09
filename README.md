@@ -41,8 +41,8 @@ Setting up the project
 3. ⚠️ Update .env
 
     ```bash
-        ## Update these lines in app/.env and app/.env.test with you Token and uncomment them 
-        #THE_MOVIE_DB_TOKEN=yourthemoviedbtoken
+        ## Update these lines in app/.env and app/.env.test with your API Read Access Token and uncomment them 
+        #THE_MOVIE_DB_TOKEN=YourThemoviedbAPIReadAccessToken
     ```
 
 4. ⚠️ BE SURE THAT 8080 port is available on your host machine
