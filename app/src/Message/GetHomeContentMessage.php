@@ -2,6 +2,6 @@
 
 namespace App\Message;
 
-class GetHomeContentMessage implements MessageInterface
+readonly class GetHomeContentMessage implements MessageInterface
 {
 }
