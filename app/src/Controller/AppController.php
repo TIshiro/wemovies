@@ -22,21 +22,6 @@ class AppController extends AbstractController
         $this->genres = $this->theMovieDB->genres(); // Récupérer les genres une seule fois
     }
 
-
-    #[Route('/genre/{id}/movies', name: 'app_movies_by_genre')]
-    public function moviesByGenre(int $id): Response
-    {
-        $genre = $this->theMovieDB->genre($id);
-        if (!$genre instanceof Genre) {
-            throw new NotFoundHttpException();
-        }
-        return $this->renderMoviesPage(
-            'We movies: ' . ucfirst($genre->name),
-            $this->theMovieDB->moviesByGenre($id),
-            $genre
-        );
-    }
-
     #[Route('/search', name: 'app_search')]
     public function search(Request $request): Response
     {
