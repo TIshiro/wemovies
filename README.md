@@ -2,71 +2,70 @@
 
 Wemovies is a mini video library project based on:
 - Docker/Docker-compose
-- PHP8, Symfony6, Nginx
+- PHP8, Symfony7, Nginx, TailwindCSS
 - TheMovieDB API as data source
 
 Setting up the project
 ==================
 
-## ❇️ Get Docker/Docker-compose
+##  Get Docker/Docker-compose
 
 ```bash
-## Official documentation here: 
-https://docs.docker.com/get-docker/
+  ## Official documentation here:
+  https://docs.docker.com/get-docker/
 ```
-
-## ❇️ Get your TheMovieDB API Token:
+  
+## Get your TheMovieDB API Token:
 
 ```bash
-## Signup here 
-https://www.themoviedb.org/signup
-## Get your API Token here:
-https://www.themoviedb.org/settings/api
+    ## Signup here 
+    https://www.themoviedb.org/signup
+
+    ## Get your API Token here:
+    https://www.themoviedb.org/settings/api
 ```
-
-## ❇️ Update your environment:
-
-```bash
-## Update these lines in app/.env and app/.env.test with you Token and uncomment them 
-#THE_MOVIE_DB_TOKEN=yourthemoviedbtoken
-```
-
 ## ⚠️ ️Warning
+
+  **UPDATE .env:**
+
+```bash
+    ## Update these lines in app/.env and app/.env.test with you Token and uncomment them 
+    #THE_MOVIE_DB_TOKEN=yourthemoviedbtoken
+```
 
 __**BE SURE THAT 8080 port is available on your host machine**__
 
-- If not, update the `docker-compose.yml` file with your desired port
+- If not, update the `compose.yml` file with your desired port
 ```bash
     ports:
       - "8080:80"
 ```
 
-## ❇️ Up your environment:
+## ❇️ Let's up our environment:
+1. Move to project root
 
 ```bash
-docker-compose up -d --build
+  cd wemovies
 ```
 
-## ❇️ Install dependencies:
+2. Up our Docker containers
 
 ```bash
-docker exec -it symfony-app-php bash
-
-composer install
+   make up
 ```
 
-- Go to http://localhost:8080
+3. Install Symfony dependencies
+```bash
+    make install
+```
 
-Enjoy!
+4. Go to http://localhost:8080
+
+That's it!
 
 ## ❇️ Tests:
 
 ```bash
-docker exec -it symfony-app-php bash
-
-##Integrations tests
-vendor/bin/simple-phpunit
-
-##Fucntionnals tests
-vendor/bin/behat
+##PHPUnit tests
+  make unit_test
 ```
