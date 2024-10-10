@@ -27,6 +27,19 @@ class AppResponseTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider getAppMessages
+     */
+    public function testAppResponseGetContentMustReturnArray(
+        object $response,
+        string $class
+    ): void {
+        $this->assertIsArray(
+            $response->getContent(),
+            $class . ' should implement' . ResponseInterface::class . '.'
+        );
+    }
+
     public function getAppMessages(): array
     {
         return [
