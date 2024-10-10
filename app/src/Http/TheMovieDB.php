@@ -14,15 +14,15 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-readonly class TheMovieDB
+class TheMovieDB
 {
     private const API_BASE_PATH = '/3';
     private array $genresCache;
 
     public function __construct(
-        private HttpClientInterface $theMovieDBApi,
-        private SerializerInterface $serializer,
-        private LoggerInterface $logger
+        private readonly HttpClientInterface $theMovieDBApi,
+        private readonly SerializerInterface $serializer,
+        private readonly LoggerInterface $logger
     ) {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
     }
