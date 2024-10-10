@@ -5,50 +5,67 @@ declare(strict_types=1);
 namespace App\Tests\Behat;
 
 use Behat\Behat\Context\Context;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\KernelInterface;
-use function PHPUnit\Framework\assertEquals;
-use function PHPUnit\Framework\assertNotNull;
+use Behat\Gherkin\Node\TableNode;
+use Behat\MinkExtension\Context\MinkContext;
+use Exception;
+use PHPUnit\Framework\Assert;
 
-final class AppContext implements Context
+final class AppContext extends MinkContext implements Context
 {
-    /** @var KernelInterface */
-    private $kernel;
-
-    /** @var Response|null */
-    private $response;
-
-    public function __construct(KernelInterface $kernel)
+    /**
+     * @Then the response should be a valid JSON
+     * @throws Exception
+     */
+    public function theResponseShouldBeAJson(): void
     {
-        $this->kernel = $kernel;
+        $this->decodeJsonFromResponse();
     }
 
     /**
-     * @Given I visit :path
+     * @Then the JSON response should contain :suggestion
+     * @throws Exception
      */
-    public function sendRequestTo(string $path): void
+    public function theJsonResponseShouldContain(string $suggestion): void
     {
-        $this->response = $this->kernel->handle(Request::create($path, 'GET'));
+        $json = $this->decodeJsonFromResponse();
+
+        Assert::assertContains(
+            $suggestion,
+            $json,
+            sprintf('Response JSON does not contain the suggestion "%s"', $suggestion)
+        );
     }
 
     /**
-     * @Then the response status code should be :arg1
+     * @throws Exception
      */
-    public function theResponseStatusCodeShouldBe($arg1): void
+    private function decodeJsonFromResponse(): array
     {
-        assertNotNull($this->response);
-        assertEquals($arg1, $this->response->getStatusCode());
+        $response = $this->getSession()->getPage()->getContent();
+        $json = json_decode($response, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new Exception('Response is not a valid JSON: ' . json_last_error_msg());
+        }
+
+        return $json;
     }
 
     /**
-     * @Then I should see the text :text
+     * @Given /^the JSON response should have the following keys:$/
+     * @throws Exception
      */
-    public function iShouldSeeTheText($text)
+    public function theJSONResponseShouldHaveKeys(TableNode $table): void
     {
-        $requestContentWithoutTags = strip_tags($this->response->getContent());
-        if (!str_contains($requestContentWithoutTags, $text)) {
-            throw new \RuntimeException("Cannot find expected text '$text'");
+        $keys = $table->getColumn(0);
+        $json = $this->decodeJsonFromResponse();
+
+        foreach ($keys as $key) {
+            Assert::assertArrayHasKey(
+                $key,
+                $json,
+                sprintf('Response JSON does not contain the key "%s"', $key)
+            );
         }
     }
 }
