@@ -4,19 +4,19 @@ namespace App\MessageHandler;
 
 use App\Http\Model\Video;
 use App\Http\TheMovieDB;
-use App\Message\VideoMessage;
-use App\Response\VideoResponse;
+use App\Message\GetMovieVideoMessage;
+use App\Response\GetMovieVideoResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-readonly class VideoMessageHandler
+readonly class GetMovieVideoMessageHandler
 {
     public function __construct(private TheMovieDB $theMovieDB)
     {
     }
 
-    public function __invoke(VideoMessage $message): VideoResponse
+    public function __invoke(GetMovieVideoMessage $message): GetMovieVideoResponse
     {
         $id = $message->getMovieId();
         $video = $this->theMovieDB->teaser($id);
@@ -24,6 +24,6 @@ readonly class VideoMessageHandler
             throw new NotFoundHttpException();
         }
 
-        return new VideoResponse($video);
+        return new GetMovieVideoResponse($video);
     }
 }

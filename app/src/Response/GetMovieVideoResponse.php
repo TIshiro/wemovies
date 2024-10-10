@@ -4,7 +4,7 @@ namespace App\Response;
 
 use App\Http\Model\Video;
 
-readonly class VideoResponse implements ResponseInterface
+readonly class GetMovieVideoResponse implements ResponseInterface
 {
     public function __construct(private Video $video)
     {

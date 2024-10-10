@@ -2,7 +2,7 @@
 
 namespace App\Message;
 
-readonly class VideoMessage implements MessageInterface
+readonly class GetMovieVideoMessage implements MessageInterface
 {
     public function __construct(private int $movieId)
     {
