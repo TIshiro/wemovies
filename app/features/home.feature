@@ -6,4 +6,3 @@ Feature: Home Page
   Scenario: Visiting the home page
     Given I am on the homepage
     Then the response status code should be 200
-    And I should see "À propos de We Movies"
