@@ -76,8 +76,12 @@ Setting up the project
 That's it!
 
 ## ❇️ Tests:
-
+1. PhpUnit tests
     ```bash
-    ##PHPUnit tests
       make unit_test
+    ```
+
+2. Behat tests
+    ```bash
+      make behat_test
     ```

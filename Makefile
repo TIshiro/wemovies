@@ -25,6 +25,11 @@ unit_test:
 	@echo "Running PHPUnit tests..."
 	$(DOCKER) exec $(PHP_CONTAINER) vendor/bin/phpunit
 
+# Run behat tests
+behat_test:
+	@echo "Running PHPUnit tests..."
+	$(DOCKER) exec $(PHP_CONTAINER) vendor/bin/behat
+
 # Clean up the Docker containers and volumes
 down:
 	@echo "Cleaning up..."
