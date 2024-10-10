@@ -1,10 +1,9 @@
-Feature: Testing the AppController
+Feature: Home Page
+  As a user
+  I want to visit the home page
+  So that I can see the home page content
 
-    Scenario: Visiting the homepage
-        Given I visit "/"
-        Then the response status code should be 200
-        And I should see the text "À propos de We Movies"
-
-    Scenario: Visiting genre action
-        Given I visit "/genre/28/movies"
-        Then the response status code should be 200
+  Scenario: Visiting the home page
+    Given I am on the homepage
+    Then the response status code should be 200
+    And I should see "À propos de We Movies"

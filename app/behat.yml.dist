@@ -1,11 +1,18 @@
 default:
-    suites:
+  suites:
+    default:
+      contexts:
+        - App\Tests\Behat\AppContext
+  extensions:
+    FriendsOfBehat\SymfonyExtension:
+      bootstrap: tests/bootstrap.php
+      kernel:
+        class: 'App\Kernel'
+        path: 'src/Kernel.php'
+    Behat\MinkExtension:
+      base_url: http://localhost:8000
+      sessions:
+        symfony:
+          symfony: ~
         default:
-            contexts:
-                - App\Tests\Behat\AppContext:
-                    kernel:
-                      env_variables_provider: 'symfony'
-
-    extensions:
-        FriendsOfBehat\SymfonyExtension:
-            bootstrap: tests/bootstrap.php
+          symfony: ~
