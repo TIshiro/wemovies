@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Behat;
 
 use Behat\Behat\Context\Context;
+use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\MinkContext;
 use Exception;
 use PHPUnit\Framework\Assert;
@@ -48,5 +49,23 @@ final class AppContext extends MinkContext implements Context
         }
 
         return $json;
+    }
+
+    /**
+     * @Given /^the JSON response should have the following keys:$/
+     * @throws Exception
+     */
+    public function theJSONResponseShouldHaveKeys(TableNode $table): void
+    {
+        $keys = $table->getColumn(0);
+        $json = $this->decodeJsonFromResponse();
+
+        foreach ($keys as $key) {
+            Assert::assertArrayHasKey(
+                $key,
+                $json,
+                sprintf('Response JSON does not contain the key "%s"', $key)
+            );
+        }
     }
 }
