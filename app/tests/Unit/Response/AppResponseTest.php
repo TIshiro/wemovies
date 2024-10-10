@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 class AppResponseTest extends TestCase
 {
     /**
-     * @dataProvider getAppMessages
+     * @dataProvider getAppResponses
      */
     public function testAppResponseMustImplementsResponseInterface(
         object $response,
@@ -28,7 +28,7 @@ class AppResponseTest extends TestCase
     }
 
     /**
-     * @dataProvider getAppMessages
+     * @dataProvider getAppResponses
      */
     public function testAppResponseGetContentMustReturnArray(
         object $response,
@@ -40,7 +40,7 @@ class AppResponseTest extends TestCase
         );
     }
 
-    public function getAppMessages(): array
+    public function getAppResponses(): array
     {
         return [
             'GetGenreContentResponse' => [
