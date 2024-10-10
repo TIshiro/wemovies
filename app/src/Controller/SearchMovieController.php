@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Message\SearchMessage;
+use App\Message\SearchMovieMessage;
 use App\MessageHandler\AppHandleTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,7 +11,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/search', name: 'app_search')]
-class SearchController extends AbstractController
+class SearchMovieController extends AbstractController
 {
     use AppHandleTrait;
 
@@ -22,7 +22,7 @@ class SearchController extends AbstractController
     public function __invoke(Request $request): Response
     {
         $query = $request->query->get('q');
-        $result = $this->handleMessage(new SearchMessage($query));
+        $result = $this->handleMessage(new SearchMovieMessage($query));
 
         return $this->render('base.html.twig', $result->getContent());
     }

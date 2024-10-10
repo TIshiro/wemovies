@@ -2,7 +2,7 @@
 
 namespace App\Message;
 
-readonly class SearchMessage implements MessageInterface
+readonly class SearchMovieMessage implements MessageInterface
 {
     public function __construct(private string $query)
     {

@@ -3,12 +3,12 @@
 namespace App\MessageHandler;
 
 use App\Http\TheMovieDB;
-use App\Message\SearchMessage;
-use App\Response\SearchResponse;
+use App\Message\SearchMovieMessage;
+use App\Response\SearchMovieResponse;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-readonly class SearchMessageHandler
+readonly class SearchMovieMessageHandler
 {
     use ResponseTrait;
 
@@ -16,12 +16,12 @@ readonly class SearchMessageHandler
     {
     }
 
-    public function __invoke(SearchMessage $message): SearchResponse
+    public function __invoke(SearchMovieMessage $message): SearchMovieResponse
     {
         $query = $message->getQuery();
         $topRatedMovies = $this->theMovieDB->movies($query);
         return $this->render(
-            SearchResponse::class,
+            SearchMovieResponse::class,
             'We movies: Result for ' . $query,
             $this->theMovieDB->movies($query),
             null,
